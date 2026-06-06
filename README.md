@@ -15,7 +15,7 @@ coordena as Entities; **Boundary e Entity nunca se comunicam diretamente**).
 | Estereótipo | Pacote | Classe(s) | Responsabilidade |
 |---|---|---|---|
 | **Boundary** | `boundary` | `UIJogoCartas` | Interface CLI com o jogador (entrada/saída). |
-| **Control** | `control` | `CtrlJogarCartas` (+ DTOs `EstadoJogador`, `ResultadoJogador`) | Coordena o caso de uso "Jogar Cartas". |
+| **Control** | `control` | `CtrlJogarCartas`| Coordena o caso de uso "Jogar Cartas". |
 | **Entity** | `entity` | `Jogo`, `Dealer`, `Baralho`, `Jogador`, `Carta`, `Resultado` | Domínio do jogo. |
 
 Relacionamentos (conforme o diagrama):
@@ -25,9 +25,6 @@ UIJogoCartas ──usa──▶ CtrlJogarCartas ┄┄▶ Jogo
                                          ├─ 1 Dealer ──administra──▶ 1 Baralho ──▶ 0..52 Carta
                                          └─ 1..* Jogador ──tem──▶ 0..* Carta
 ```
-
-O `Dealer` apenas **administra o Baralho** (não possui cartas próprias); a **mão da casa** é um
-`Jogador` (`maoDistribuidor`) mantido pelo `Jogo`.
 
 ## Regras de negócio
 
@@ -79,7 +76,5 @@ src/main/java/com/vendramel/blackjack/
 ├── BlackjackApplication.java        # @SpringBootApplication + CommandLineRunner
 ├── boundary/UIJogoCartas.java
 ├── control/CtrlJogarCartas.java
-├── control/EstadoJogador.java       # DTO
-├── control/ResultadoJogador.java    # DTO
 └── entity/{Carta,Baralho,Dealer,Jogador,Jogo,Resultado}.java
 ```
