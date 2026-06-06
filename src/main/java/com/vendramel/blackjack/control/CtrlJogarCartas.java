@@ -1,7 +1,6 @@
 package com.vendramel.blackjack.control;
 
 import com.vendramel.blackjack.entity.Baralho;
-import com.vendramel.blackjack.entity.Carta;
 import com.vendramel.blackjack.entity.Dealer;
 import com.vendramel.blackjack.entity.Jogador;
 import com.vendramel.blackjack.entity.Jogo;
@@ -41,12 +40,12 @@ public class CtrlJogarCartas {
         return jogo.getMaoDistribuidor().getCartas().get(0).toString();
     }
 
-    public EstadoJogador getEstadoJogador(int indice) {
-        return paraEstado(jogo.getJogadores().get(indice));
+    public Jogador getJogador(int indice) {
+        return jogo.getJogadores().get(indice);
     }
 
-    public EstadoJogador getEstadoDistribuidor() {
-        return paraEstado(jogo.getMaoDistribuidor());
+    public Jogador getDistribuidor() {
+        return jogo.getMaoDistribuidor();
     }
 
     public void pedirCarta(int indice) {
@@ -65,33 +64,12 @@ public class CtrlJogarCartas {
         jogo.finalizarJogo();
     }
 
-    public ResultadoJogador getResultado(int indice) {
+    public Resultado getResultado(int indice) {
         Jogador jogador = jogo.getJogadores().get(indice);
-        Resultado resultado = jogo.apurarResultado(jogador);
-        return new ResultadoJogador(
-                jogador.getNome(),
-                jogador.calcularTotal(),
-                jogo.getMaoDistribuidor().calcularTotal(),
-                descrever(resultado));
+        return jogo.apurarResultado(jogador);
     }
 
     public boolean isRodadaEmAndamento() {
         return jogo != null && jogo.isLoopJogo();
-    }
-
-    private EstadoJogador paraEstado(Jogador jogador) {
-        List<String> cartas = new ArrayList<>();
-        for (Carta carta : jogador.getCartas()) {
-            cartas.add(carta.toString());
-        }
-        return new EstadoJogador(jogador.getNome(), cartas, jogador.calcularTotal(), jogador.estourou());
-    }
-
-    private String descrever(Resultado resultado) {
-        return switch (resultado) {
-            case VITORIA -> "Venceu";
-            case DERROTA -> "Perdeu";
-            case EMPATE -> "Empatou";
-        };
     }
 }

@@ -1,8 +1,9 @@
 package com.vendramel.blackjack.boundary;
 
 import com.vendramel.blackjack.control.CtrlJogarCartas;
-import com.vendramel.blackjack.control.EstadoJogador;
-import com.vendramel.blackjack.control.ResultadoJogador;
+import com.vendramel.blackjack.entity.Carta;
+import com.vendramel.blackjack.entity.Jogador;
+import com.vendramel.blackjack.entity.Resultado;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -73,16 +74,16 @@ public class UIJogoCartas {
     }
 
     private void jogarTurno(int indice) {
-        EstadoJogador estado = controle.getEstadoJogador(indice);
-        saida.println("\n--- Vez de " + estado.nome() + " ---");
-        mostrarMao(estado);
+        Jogador jogador = controle.getJogador(indice);
+        saida.println("\n--- Vez de " + jogador.getNome() + " ---");
+        mostrarMao(jogador);
         while (!controle.jogadorEstourou(indice)) {
             saida.print("(P)edir carta ou (M)anter? ");
             String opcao = scanner.nextLine().trim().toUpperCase();
             if (opcao.startsWith("P")) {
                 controle.pedirCarta(indice);
-                estado = controle.getEstadoJogador(indice);
-                mostrarMao(estado);
+                jogador = controle.getJogador(indice);
+                mostrarMao(jogador);
             } else if (opcao.startsWith("M")) {
                 break;
             } else {
@@ -90,29 +91,43 @@ public class UIJogoCartas {
             }
         }
         if (controle.jogadorEstourou(indice)) {
-            saida.println(">> " + estado.nome() + " ESTOUROU!");
+            saida.println(">> " + jogador.getNome() + " ESTOUROU!");
         }
     }
 
-    private void mostrarMao(EstadoJogador estado) {
-        saida.println("Cartas de " + estado.nome() + ": " + String.join(", ", estado.cartas())
-                + " (total: " + estado.total() + ")");
+    private void mostrarMao(Jogador jogador) {
+        List<String> cartas = new ArrayList<>();
+        for (Carta carta : jogador.getCartas()) {
+            cartas.add(carta.toString());
+        }
+        saida.println("Cartas de " + jogador.getNome() + ": " + String.join(", ", cartas)
+                + " (total: " + jogador.calcularTotal() + ")");
     }
 
     private void mostrarResultados() {
-        EstadoJogador distribuidor = controle.getEstadoDistribuidor();
+        Jogador distribuidor = controle.getDistribuidor();
+        List<String> cartasDist = new ArrayList<>();
+        for (Carta carta : distribuidor.getCartas()) {
+            cartasDist.add(carta.toString());
+        }
         saida.println("\n=======================================");
-        saida.println("Mao do distribuidor: " + String.join(", ", distribuidor.cartas())
-                + " (total: " + distribuidor.total() + ")");
+        saida.println("Mao do distribuidor: " + String.join(", ", cartasDist)
+                + " (total: " + distribuidor.calcularTotal() + ")");
         if (distribuidor.estourou()) {
             saida.println(">> Distribuidor ESTOUROU!");
         }
         saida.println("---------------------------------------");
         int quantidade = controle.getQuantidadeJogadores();
         for (int i = 0; i < quantidade; i++) {
-            ResultadoJogador resultado = controle.getResultado(i);
-            saida.println(resultado.nome() + ": " + resultado.total()
-                    + " x " + resultado.totalDistribuidor() + " (casa) -> " + resultado.situacao());
+            Jogador jogador = controle.getJogador(i);
+            Resultado resultado = controle.getResultado(i);
+            String situacao = switch (resultado) {
+                case VITORIA -> "Venceu";
+                case DERROTA -> "Perdeu";
+                case EMPATE -> "Empatou";
+            };
+            saida.println(jogador.getNome() + ": " + jogador.calcularTotal()
+                    + " x " + distribuidor.calcularTotal() + " (casa) -> " + situacao);
         }
         saida.println("=======================================");
     }
